@@ -23,7 +23,7 @@ services:
       - app_state:/var/www/state
 
   mysql:
-    image: mysql:8.0
+    image: ${MYSQL_IMAGE:-harbor.10rig.com:8443/dockerhub-proxy/library/mysql:8.0}
     restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
