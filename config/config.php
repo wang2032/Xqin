@@ -3,8 +3,8 @@
  * 应用全局配置文件（前台和后台共用）
  */
 
-// 调试模式：上线环境请保持为 false
-define('DEBUG_MODE', false);
+// 调试模式：上线环境请保持为 false（可用环境变量 APP_DEBUG=1 临时开启）
+define('DEBUG_MODE', getenv('APP_DEBUG') === '1');
 
 // 错误报告：开发环境显示错误，上线后仅记录到日志
 if (DEBUG_MODE) {
@@ -53,8 +53,8 @@ define('UPLOAD_DIR', ROOT_PATH . '/uploads/');
 define('UPLOAD_URL', BASE_URL . '/uploads/');
 define('MAX_FILE_SIZE', 15 * 1024 * 1024); // 15MB 硬上限
 
-// 安全密钥（请在生产环境中改为随机字符串）
-define('SECRET_KEY', 'vK9z2f4QnB1sL8yC3wT7hP5mR0xG6dJ');
+// 安全密钥（优先读环境变量 APP_SECRET_KEY；生产环境务必设置随机值）
+define('SECRET_KEY', getenv('APP_SECRET_KEY') ?: 'vK9z2f4QnB1sL8yC3wT7hP5mR0xG6dJ');
 
 // 登录防爆破配置
 define('LOGIN_MAX_ATTEMPTS', 5);          // 同一账号+IP 在窗口期内最大尝试次数

@@ -1,6 +1,10 @@
 # 配置文件(由安装向导自动生成)
 /config/database.php
 
+# 环境变量与服务器持久化数据
+.env
+/data/
+
 # 上传文件
 /uploads/*
 !/uploads/.gitkeep

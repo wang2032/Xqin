@@ -1,0 +1,26 @@
+services:
+  app:
+    image: ${APP_IMAGE:-ghcr.io/CHANGE_ME/i_love_day:latest}
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-18923}:80"
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_CHARSET: ${DB_CHARSET:-utf8mb4}
+      APP_SECRET_KEY: ${APP_SECRET_KEY}
+      APP_DEBUG: ${APP_DEBUG:-}
+    volumes:
+      # 上传的图片/视频（务必定期备份此目录）
+      - ./data/uploads:/var/www/html/uploads
+      # 持久化 .installed 安装标记
+      - app_state:/var/www/state
+    extra_hosts:
+      # 当 MySQL 跑在宿主机上时，DB_HOST 可填 host.docker.internal
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  app_state:
