@@ -2,15 +2,18 @@ services:
   app:
     image: ${APP_IMAGE:-ghcr.io/CHANGE_ME/i_love_day:latest}
     restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
     ports:
       - "${APP_PORT:-18923}:80"
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-i_love_day}
+      DB_USER: root
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_CHARSET: ${DB_CHARSET:-utf8mb4}
+      DB_CHARSET: utf8mb4
       APP_SECRET_KEY: ${APP_SECRET_KEY}
       APP_DEBUG: ${APP_DEBUG:-}
     volumes:
@@ -18,9 +21,23 @@ services:
       - ./data/uploads:/var/www/html/uploads
       # 持久化 .installed 安装标记
       - app_state:/var/www/state
-    extra_hosts:
-      # 当 MySQL 跑在宿主机上时，DB_HOST 可填 host.docker.internal
-      - "host.docker.internal:host-gateway"
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:-i_love_day}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # 不对宿主机暴露端口，仅容器内部网络访问，更安全
 
 volumes:
   app_state:
+  mysql_data:
